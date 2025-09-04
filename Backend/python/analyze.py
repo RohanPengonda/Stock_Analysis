@@ -60,10 +60,15 @@ def main():
             print(f"DEBUG: Chart file NOT created at {chart_path}", file=sys.stderr)
 
         # Return result as JSON
+        # Always return relative path for URL construction
+        relative_path = "uploads/chart.png" if output_dir.endswith('uploads') else "uploads/chart.png"
+        
         result = {
             "message": "Analysis completed",
-            "chartPath": chart_path.replace("\\", "/")  # for Windows compatibility
+            "chartPath": relative_path
         }
+        
+        print(f"DEBUG: Returning result: {result}", file=sys.stderr)
 
         print(json.dumps(result))
 

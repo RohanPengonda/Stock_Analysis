@@ -19,20 +19,31 @@ export const runPythonAnalysis = (filePath) => {
 
     // When Python process finishes
     pythonProcess.on("close", (code) => {
+      console.log("Python process exit code:", code);
+      console.log("Python stdout:", data);
+      console.log("Python stderr:", error);
+      
       if (error) {
+        console.error("Python stderr error:", error);
         reject(error);
         return;
       }
       try {
         const result = JSON.parse(data);
+        console.log("Parsed Python result:", result);
 
         // Add full URL for frontend
         if (result.chartPath) {
           result.chartUrl = `${process.env.BASE_URL || 'http://localhost:5000'}/${result.chartPath}`;
+          console.log("Generated chartUrl:", result.chartUrl);
+        } else {
+          console.log("No chartPath in result:", result);
         }
 
         resolve(result);
       } catch (err) {
+        console.error("Failed to parse Python output:", err);
+        console.error("Raw Python data:", data);
         reject(`Failed to parse Python output: ${err}`);
       }
     });
