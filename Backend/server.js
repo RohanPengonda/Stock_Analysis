@@ -10,6 +10,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "*",
+
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -20,8 +21,8 @@ app.use("/uploads", express.static("uploads"));
 
 // health check route
 app.get("/", (req, res) => {
-  res.json({ 
-    message: "Stock Analysis API is running!", 
+  res.json({
+    message: "Stock Analysis API is running!",
     status: "healthy",
     endpoints: {
       upload: "/api/upload"
