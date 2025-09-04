@@ -1,6 +1,8 @@
 import sys
 import pandas as pd
 import json
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for faster processing
 import matplotlib.pyplot as plt
 import os
 
@@ -32,32 +34,24 @@ def main():
         # Create uploads folder if not exists  
         # Use /tmp on production, uploads locally
         output_dir = os.environ.get('CHART_DIR', '/tmp' if os.environ.get('RENDER') else 'uploads')
-        print(f"DEBUG: Using output directory: {output_dir}", file=sys.stderr)
         os.makedirs(output_dir, exist_ok=True)
         chart_path = os.path.join(output_dir, "chart.png")
-        print(f"DEBUG: Chart will be saved to: {chart_path}", file=sys.stderr)
 
-        # Plot chart
-        plt.figure(figsize=(10, 6))
-        plt.plot(df['Date'], df['Avg'], label="Avg Price", color="blue")
-        plt.plot(df['Date'], df['50DMA'], label="50 DMA", color="orange")
-        plt.plot(df['Date'], df['100DMA'], label="100 DMA", color="green")
-        plt.plot(df['Date'], df['200DMA'], label="200 DMA", color="red")
+        # Plot chart with optimizations
+        plt.figure(figsize=(10, 6), dpi=80)  # Lower DPI for faster rendering
+        plt.plot(df['Date'], df['Avg'], label="Avg Price", color="blue", linewidth=1)
+        plt.plot(df['Date'], df['50DMA'], label="50 DMA", color="orange", linewidth=1)
+        plt.plot(df['Date'], df['100DMA'], label="100 DMA", color="green", linewidth=1)
+        plt.plot(df['Date'], df['200DMA'], label="200 DMA", color="red", linewidth=1)
 
         plt.xlabel("Date")
         plt.ylabel("Price")
         plt.title("Stock Price with Moving Averages")
         plt.legend()
-        plt.grid(True)
+        plt.grid(True, alpha=0.3)  # Lighter grid
         plt.tight_layout()
-        plt.savefig(chart_path)
+        plt.savefig(chart_path, dpi=80, bbox_inches='tight')  # Optimized save
         plt.close()
-        
-        # Verify file was created
-        if os.path.exists(chart_path):
-            print(f"DEBUG: Chart file created successfully at {chart_path}", file=sys.stderr)
-        else:
-            print(f"DEBUG: Chart file NOT created at {chart_path}", file=sys.stderr)
 
         # Return result as JSON
         # Always return relative path for URL construction
@@ -67,8 +61,6 @@ def main():
             "message": "Analysis completed",
             "chartPath": relative_path
         }
-        
-        print(f"DEBUG: Returning result: {result}", file=sys.stderr)
 
         print(json.dumps(result))
 

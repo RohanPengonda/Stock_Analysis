@@ -30,9 +30,6 @@ export const handleUpload = async (req, res) => {
       dma200: result.dma200,
     });
   } catch (error) {
-    console.error("Upload Controller Error:", error);
-    console.error("Error stack:", error.stack);
-    
     // Clean up uploaded file even if processing fails
     if (req.file && req.file.path) {
       try {
@@ -41,9 +38,6 @@ export const handleUpload = async (req, res) => {
         console.warn("Failed to delete uploaded file:", cleanupError);
       }
     }
-    res.status(500).json({ 
-      error: "Failed to analyze file",
-      details: error.message 
-    });
+    res.status(500).json({ error: "Failed to analyze file" });
   }
 };

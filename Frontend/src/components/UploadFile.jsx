@@ -13,11 +13,8 @@ const UploadFile = () => {
     if (!file) {
       setMessage("Please select a file first.");
       alert("Please select a file first.");
-      console.log(message);
-
       return;
     }
-    console.log(message);
 
     setLoading(true);
     setMessage("Analyzing your file...");
@@ -33,19 +30,15 @@ const UploadFile = () => {
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      console.log("Backend Response:", response.data);
-
       setMessage(" File processed successfully!");
       const data = response.data;
 
       if (data.chartUrl) {
         setChartUrl(data.chartUrl + `?t=${Date.now()}`);
-        console.log("Chart URL:", data.chartUrl);
       } else {
         setMessage("Analysis completed but no chart data received.");
       }
     } catch (error) {
-      console.error("Upload Error:", error);
       setMessage(" Failed to upload file.");
     } finally {
       setLoading(false);
