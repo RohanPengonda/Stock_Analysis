@@ -18,7 +18,7 @@ def main():
         elif file_path.endswith(".xlsx"):
             df = pd.read_excel(file_path)
         else:
-            raise ValueError("Unsupported file format. Use CSV or XLSX.")
+            raise ValueError("Unsupported file format. Upload CSV or XLSX.")
 
         # Ensure Date is in datetime format and sorted
         df['Date'] = pd.to_datetime(df['Date'])

@@ -1,24 +1,24 @@
 import React, { useState } from "react";
 import axios from "axios";
-import ShowData from "./ShowData";
 
 const UploadFile = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
-  const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [showImageChart, setShowImageChart] = useState(false);
   const [chartUrl, setChartUrl] = useState("");
 
   const uploadFile = async () => {
     if (!file) {
       setMessage("Please select a file first.");
+      alert("Please select a file first.");
+      console.log(message);
+
       return;
     }
+    console.log(message);
 
     setLoading(true);
-    setMessage("📊 Analyzing your file...");
-    setChartData(null);
+    setMessage("Analyzing your file...");
     setChartUrl("");
 
     const formData = new FormData();
@@ -32,29 +32,19 @@ const UploadFile = () => {
       );
 
       console.log("Backend Response:", response.data);
-      setMessage("✅ File processed successfully!");
+
+      setMessage(" File processed successfully!");
       const data = response.data;
 
-      if (data.chartData && data.chartData.labels && data.chartData.datasets) {
-        setChartData({
-          labels: data.chartData.labels,
-          datasets: data.chartData.datasets.map((dataset) => ({
-            ...dataset,
-            tension: 0.1,
-            pointRadius: 2,
-            pointHoverRadius: 5,
-          })),
-        });
-        setShowImageChart(false);
-      } else if (data.chartUrl) {
+      if (data.chartUrl) {
         setChartUrl(data.chartUrl + `?t=${Date.now()}`);
-        setShowImageChart(true);
+        console.log("Chart URL:", data.chartUrl);
       } else {
         setMessage("Analysis completed but no chart data received.");
       }
     } catch (error) {
       console.error("Upload Error:", error);
-      setMessage("❌ Failed to upload file.");
+      setMessage(" Failed to upload file.");
     } finally {
       setLoading(false);
     }
@@ -77,14 +67,14 @@ const UploadFile = () => {
           onChange={(e) => setFile(e.target.files[0])}
           className="hidden"
         />
-        📁 Choose File
+        Choose File
       </label>
 
       {/* Show selected file */}
       {file && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
           <p className="text-sm text-blue-800">
-            📂 Selected: <span className="font-semibold">{file.name}</span>
+            Selected: <span className="font-semibold">{file.name}</span>
           </p>
           <p className="text-xs text-blue-600 mt-1">
             Size: {(file.size / 1024).toFixed(1)} KB
@@ -100,18 +90,18 @@ const UploadFile = () => {
             : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
         }`}
         onClick={uploadFile}
-        disabled={loading || !file}
+        disabled={loading}
       >
-        {loading ? "🔄 Processing..." : "🚀 Upload & Analyze"}
+        {loading ? " Processing..." : " Upload & Analyze"}
       </button>
 
       {/* Status message */}
       {message && (
         <div
           className={`mt-5 p-3 rounded-lg font-medium ${
-            message.includes("✅")
+            message.includes("Yes...")
               ? "bg-green-100 text-green-800 border border-green-200"
-              : message.includes("❌")
+              : message.includes("No.....")
               ? "bg-red-100 text-red-800 border border-red-200"
               : "bg-blue-100 text-blue-800 border border-blue-200"
           }`}
@@ -120,18 +110,22 @@ const UploadFile = () => {
         </div>
       )}
 
-      {/* Chart component */}
-      <ShowData
-        chartData={chartData}
-        showImageChart={showImageChart}
-        chartUrl={chartUrl}
-      />
+      {/* Chart Image */}
+      {chartUrl && (
+        <div className="mt-8">
+          <img
+            src={chartUrl}
+            alt="Stock Analysis Chart"
+            className="max-w-full h-auto rounded-lg shadow-lg"
+          />
+        </div>
+      )}
 
       {/* Instructions */}
       {!file && (
         <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-2xl">
           <h3 className="font-semibold text-yellow-800 mb-2">
-            📋 File Requirements:
+            File Requirements:
           </h3>
           <ul className="text-sm text-yellow-700 text-left space-y-1">
             <li>• CSV or Excel format (.csv, .xlsx, .xls)</li>
