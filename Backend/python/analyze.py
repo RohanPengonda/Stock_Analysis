@@ -29,10 +29,13 @@ def main():
         df['100DMA'] = df['Avg'].rolling(window=100).mean()
         df['200DMA'] = df['Avg'].rolling(window=200).mean()
 
-        # Create uploads folder if not exists
-        output_dir = os.environ.get('CHART_DIR', 'uploads')
+        # Create uploads folder if not exists  
+        # Use /tmp on production, uploads locally
+        output_dir = os.environ.get('CHART_DIR', '/tmp' if os.environ.get('RENDER') else 'uploads')
+        print(f"DEBUG: Using output directory: {output_dir}", file=sys.stderr)
         os.makedirs(output_dir, exist_ok=True)
         chart_path = os.path.join(output_dir, "chart.png")
+        print(f"DEBUG: Chart will be saved to: {chart_path}", file=sys.stderr)
 
         # Plot chart
         plt.figure(figsize=(10, 6))
@@ -49,6 +52,12 @@ def main():
         plt.tight_layout()
         plt.savefig(chart_path)
         plt.close()
+        
+        # Verify file was created
+        if os.path.exists(chart_path):
+            print(f"DEBUG: Chart file created successfully at {chart_path}", file=sys.stderr)
+        else:
+            print(f"DEBUG: Chart file NOT created at {chart_path}", file=sys.stderr)
 
         # Return result as JSON
         result = {

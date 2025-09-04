@@ -19,6 +19,11 @@ app.use(
 // serve static files from uploads folder
 app.use("/uploads", express.static("uploads"));
 
+// serve static files from /tmp for production
+if (process.env.RENDER) {
+  app.use("/uploads", express.static("/tmp"));
+}
+
 // health check route
 app.get("/", (req, res) => {
   res.json({
