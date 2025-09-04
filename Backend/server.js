@@ -18,6 +18,17 @@ app.use(
 // serve static files from uploads folder
 app.use("/uploads", express.static("uploads"));
 
+// health check route
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "Stock Analysis API is running!", 
+    status: "healthy",
+    endpoints: {
+      upload: "/api/upload"
+    }
+  });
+});
+
 // routes
 app.use("/api/upload", uploadRoutes);
 
