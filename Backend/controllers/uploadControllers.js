@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs";
 import { runPythonAnalysis } from "../services/pythonService.js";
 
 export const handleUpload = async (req, res) => {
@@ -11,6 +12,13 @@ export const handleUpload = async (req, res) => {
 
     const result = await runPythonAnalysis(filePath);  //python analysis
 
+    // Clean up uploaded file after processing
+    try {
+      fs.unlinkSync(filePath);
+    } catch (cleanupError) {
+      console.warn("Failed to delete uploaded file:", cleanupError);
+    }
+
     // return data in json 
     res.json({
       message: "Analysis completed",
@@ -22,6 +30,14 @@ export const handleUpload = async (req, res) => {
       dma200: result.dma200,
     });
   } catch (error) {
+    // Clean up uploaded file even if processing fails
+    if (req.file && req.file.path) {
+      try {
+        fs.unlinkSync(path.resolve(req.file.path));
+      } catch (cleanupError) {
+        console.warn("Failed to delete uploaded file:", cleanupError);
+      }
+    }
     res.status(500).json({ error: "Failed to analyze file" });
   }
 };

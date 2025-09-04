@@ -30,7 +30,7 @@ def main():
         df['200DMA'] = df['Avg'].rolling(window=200).mean()
 
         # Create uploads folder if not exists
-        output_dir = "uploads"
+        output_dir = os.environ.get('CHART_DIR', 'uploads')
         os.makedirs(output_dir, exist_ok=True)
         chart_path = os.path.join(output_dir, "chart.png")
 

@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 
 export const runPythonAnalysis = (filePath) => {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn("python", ["./python/analyze.py", filePath]);
+    const pythonProcess = spawn(process.env.PYTHON_CMD || "python", ["./python/analyze.py", filePath]);
 
     let data = "";
     let error = "";
@@ -28,7 +28,7 @@ export const runPythonAnalysis = (filePath) => {
 
         // Add full URL for frontend
         if (result.chartPath) {
-          result.chartUrl = `http://localhost:5000/${result.chartPath}`;
+          result.chartUrl = `${process.env.BASE_URL || 'http://localhost:5000'}/${result.chartPath}`;
         }
 
         resolve(result);

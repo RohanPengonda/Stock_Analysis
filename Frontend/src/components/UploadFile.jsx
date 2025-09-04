@@ -7,6 +7,8 @@ const UploadFile = () => {
   const [loading, setLoading] = useState(false);
   const [chartUrl, setChartUrl] = useState("");
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const uploadFile = async () => {
     if (!file) {
       setMessage("Please select a file first.");
@@ -26,7 +28,7 @@ const UploadFile = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/upload",
+        `${API_URL}/api/upload`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
