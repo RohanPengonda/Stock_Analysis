@@ -23,14 +23,22 @@ export const runPythonAnalysis = (filePath) => {
       console.log("Python stdout:", data);
       console.log("Python stderr:", error);
       
-      if (error) {
-        console.error("Python stderr error:", error);
-        reject(error);
+      // Only reject if exit code is non-zero, not just stderr output
+      if (code !== 0) {
+        console.error("Python process failed with code:", code);
+        reject(error || `Python process exited with code ${code}`);
         return;
       }
       try {
         const result = JSON.parse(data);
         console.log("Parsed Python result:", result);
+
+        // Check if Python script returned an error
+        if (result.error) {
+          console.error("Python script error:", result.error);
+          reject(result.error);
+          return;
+        }
 
         // Add full URL for frontend
         if (result.chartPath) {
