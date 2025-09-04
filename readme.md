@@ -1,3 +1,5 @@
+# Live : https://stock-analysis-kohl.vercel.app/
+
 # 📈 Stock Data Analysis Tool
 
 A full-stack web application for analyzing stock market data with interactive visualizations. Upload CSV/Excel files containing stock data and get instant technical analysis with moving averages and trend charts.
@@ -18,7 +20,6 @@ A full-stack web application for analyzing stock market data with interactive vi
 - **Vite** - Build tool and development server
 - **Tailwind CSS** - Utility-first CSS framework
 - **Axios** - HTTP client for API requests
-- **Chart.js** - Data visualization library
 
 ### Backend
 
@@ -33,6 +34,7 @@ A full-stack web application for analyzing stock market data with interactive vi
 - **Pandas** - Data manipulation and analysis
 - **Matplotlib** - Chart generation
 - **NumPy** - Numerical computing
+- **openpyxl** - Excel file processing
 
 ## 📁 Project Structure
 
@@ -90,7 +92,7 @@ npm install
 
 ```bash
 cd Backend
-pip install pandas matplotlib numpy
+pip install -r requirements.txt
 ```
 
 ### 4. Frontend Setup
@@ -106,7 +108,7 @@ npm install
 
 ```bash
 cd Backend
-node server.js
+npm start
 ```
 
 Server runs on: `http://localhost:5000`
@@ -157,27 +159,6 @@ Date,Avg
 2024-01-03,148.75
 ```
 
-## 🔌 API Endpoints
-
-### POST `/api/upload`
-
-- **Purpose**: Upload and analyze stock data file
-- **Content-Type**: `multipart/form-data`
-- **Parameters**: `file` (CSV/Excel file)
-- **Response**:
-
-```json
-{
-  "message": "Analysis completed",
-  "chartUrl": "http://localhost:5000/uploads/chart.png",
-  "dates": [...],
-  "avg": [...],
-  "dma50": [...],
-  "dma100": [...],
-  "dma200": [...]
-}
-```
-
 ## 🎯 Key Components
 
 ### Frontend Components
@@ -210,14 +191,31 @@ Date,Avg
 - CORS configuration for secure cross-origin requests
 - Input sanitization and error handling
 
+## 🚀 Deployment
+
+### Backend (Render)
+
+1. Push code to GitHub
+2. Connect repository to Render
+3. Set Root Directory: `Backend`
+4. Environment Variables:
+   ```
+   PYTHON_CMD=python3
+   BASE_URL=https://your-app.onrender.com
+   FRONTEND_URL=https://your-frontend.vercel.app
+   CHART_DIR=/tmp
+   ```
+
+### Frontend (Vercel)
+
+1. Connect repository to Vercel
+2. Set Root Directory: `Frontend`
+3. Environment Variables:
+   ```
+   VITE_API_URL=https://your-backend.onrender.com
+   ```
+
 ## 🚨 Troubleshooting
-
-### Common Issues
-
-1. **Python not found**: Ensure Python is installed and added to PATH
-2. **Module not found**: Install required Python packages: `pip install pandas matplotlib numpy`
-3. **Port conflicts**: Change ports in server.js (backend) or vite.config.js (frontend)
-4. **File upload fails**: Check file format and ensure it contains required columns
 
 ### Error Messages
 
@@ -225,21 +223,10 @@ Date,Avg
 - "Only CSV/Excel files are allowed" - Invalid file format
 - "Failed to analyze file" - Data processing error (check file structure)
 
-## 📈 Future Enhancements
+## ⚡ Performance Notes
 
-- Support for additional technical indicators (RSI, MACD, Bollinger Bands)
-- Real-time stock data integration
-- User authentication and data persistence
-- Advanced charting with zoom and pan capabilities
-- Export functionality for analysis results
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+- **File Cleanup**: Uploaded files are automatically deleted after processing
+- **Chart Optimization**: Uses optimized matplotlib settings for faster rendering
 
 ## 📄 License
 
