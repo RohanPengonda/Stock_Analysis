@@ -22,14 +22,46 @@ def main():
         else:
             raise ValueError("Unsupported file format. Upload CSV or XLSX.")
 
+        # Clean column names (remove extra spaces)
+        df.columns = df.columns.str.strip()
+        
+        # Check for required columns and standardize
+        if 'Date' not in df.columns:
+            raise ValueError("Missing 'Date' column")
+            
+        # Handle both 'Avg' and 'Close' columns
+        price_column = None
+        if 'Avg' in df.columns:
+            price_column = 'Avg'
+        elif 'Close' in df.columns:
+            price_column = 'Close'
+        else:
+            raise ValueError("Missing price column. Need either 'Avg' or 'Close' column")
+
         # Ensure Date is in datetime format and sorted
-        df['Date'] = pd.to_datetime(df['Date'])
+        # Try multiple date formats automatically
+        try:
+            df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format=True)
+        except:
+            # If automatic parsing fails, try common formats
+            date_formats = ['%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y', '%Y/%m/%d', '%d-%m-%Y', '%m-%d-%Y']
+            parsed = False
+            for fmt in date_formats:
+                try:
+                    df['Date'] = pd.to_datetime(df['Date'], format=fmt)
+                    parsed = True
+                    break
+                except:
+                    continue
+            if not parsed:
+                raise ValueError("Unable to parse Date column. Please use standard date format (YYYY-MM-DD, MM/DD/YYYY, etc.)")
+        
         df = df.sort_values('Date')
 
-        # Calculate moving averages
-        df['50DMA'] = df['Avg'].rolling(window=50).mean()
-        df['100DMA'] = df['Avg'].rolling(window=100).mean()
-        df['200DMA'] = df['Avg'].rolling(window=200).mean()
+        # Calculate moving averages using the price column
+        df['50DMA'] = df[price_column].rolling(window=50).mean()
+        df['100DMA'] = df[price_column].rolling(window=100).mean()
+        df['200DMA'] = df[price_column].rolling(window=200).mean()
 
         # Create uploads folder if not exists  
         # Use /tmp on production, uploads locally
@@ -39,13 +71,13 @@ def main():
 
         # Plot chart with optimizations
         plt.figure(figsize=(10, 6), dpi=80)  # Lower DPI for faster rendering
-        plt.plot(df['Date'], df['Avg'], label="Avg Price", color="blue", linewidth=1)
+        plt.plot(df['Date'], df[price_column], label=f"{price_column} Price", color="blue", linewidth=1)
         plt.plot(df['Date'], df['50DMA'], label="50 DMA", color="orange", linewidth=1)
         plt.plot(df['Date'], df['100DMA'], label="100 DMA", color="green", linewidth=1)
         plt.plot(df['Date'], df['200DMA'], label="200 DMA", color="red", linewidth=1)
 
         plt.xlabel("Date")
-        plt.ylabel("Price")
+        plt.ylabel(price_column + " Price")
         plt.title("Stock Price with Moving Averages")
         plt.legend()
         plt.grid(True, alpha=0.3)  # Lighter grid
