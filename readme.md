@@ -8,7 +8,8 @@ A full-stack web application for analyzing stock market data with interactive vi
 
 - **File Upload**: Support for CSV and Excel (.xlsx, .xls) files
 - **Data Processing**: Automated calculation of 50, 100, and 200-day moving averages
-- **Visualization**: Interactive charts showing price trends and moving averages
+- **Price Prediction**: AI-powered 7-day price forecasting using Linear Regression
+- **Dual Visualization**: Separate charts for historical analysis and future predictions
 - **Real-time Analysis**: Instant processing and chart generation
 - **Responsive UI**: Modern, mobile-friendly interface with Tailwind CSS
 
@@ -34,6 +35,7 @@ A full-stack web application for analyzing stock market data with interactive vi
 - **Pandas** - Data manipulation and analysis
 - **Matplotlib** - Chart generation
 - **NumPy** - Numerical computing
+- **Scikit-learn** - Machine learning for price predictions
 - **openpyxl** - Excel file processing
 
 ## 📁 Project Structure
@@ -135,7 +137,8 @@ Frontend runs on: `http://localhost:5173`
 - Backend triggers Python script with uploaded file path
 - Python script reads data using Pandas
 - Calculates moving averages (50, 100, 200-day)
-- Generates matplotlib chart and saves as PNG
+- Trains Linear Regression model for price prediction (if 30+ days data)
+- Generates dual matplotlib charts and saves as PNG
 
 ### 3. Visualization & Response
 
@@ -148,12 +151,13 @@ Frontend runs on: `http://localhost:5173`
 Your CSV/Excel file must contain these columns:
 
 - **Date**: Date in standard format (YYYY-MM-DD, MM/DD/YYYY, etc.)
-- **Avg**: Average stock price (numeric values)
+- **Price Column**: Either 'Avg' or 'Close' (numeric values)
+- **Data Volume**: 30+ days recommended for price predictions
 
 ### Example CSV Format:
 
 ```csv
-Date,Avg
+Date,Close
 2024-01-01,150.25
 2024-01-02,152.30
 2024-01-03,148.75
@@ -178,11 +182,19 @@ Date,Avg
 
 ## 🔍 Technical Analysis Features
 
+### Historical Analysis
+
 - **50-Day Moving Average**: Short-term trend indicator
 - **100-Day Moving Average**: Medium-term trend indicator
 - **200-Day Moving Average**: Long-term trend indicator
 - **Price Visualization**: Historical price data with trend lines
-- **Interactive Charts**: Responsive charts with hover details
+
+### AI-Powered Predictions
+
+- **7-Day Forecast**: Machine learning price predictions
+- **Linear Regression Model**: Uses price patterns and moving averages
+- **Prediction Confidence**: Visual indicators and detailed forecasts
+- **Dual Chart Display**: Separate visualization for predictions
 
 ## 🛡️ Security Features
 
@@ -227,6 +239,30 @@ Date,Avg
 
 - **File Cleanup**: Uploaded files are automatically deleted after processing
 - **Chart Optimization**: Uses optimized matplotlib settings for faster rendering
+- **Smart Predictions**: Only generates forecasts when sufficient data (30+ days) available
+- **Model Efficiency**: Lightweight Linear Regression for fast processing
+
+## 🔮 Prediction Model Details
+
+### Requirements
+
+- **Minimum Data**: 30 days of historical prices
+- **Training Window**: Uses last 30 days for model training
+- **Prediction Horizon**: Forecasts next 7 days
+
+### Model Features
+
+- **Algorithm**: Linear Regression with feature engineering
+- **Input Features**: Price lags, moving average ratios, price changes
+- **Data Scaling**: MinMax normalization for optimal performance
+- **Validation**: Automatic data quality checks
+
+### Prediction Display
+
+- **Dual Charts**: Historical analysis + prediction forecast
+- **Prediction Cards**: Individual daily forecasts with dates
+- **Visual Context**: Shows recent actual prices for comparison
+- **Model Transparency**: Clearly indicates prediction methodology
 
 ## 📄 License
 
