@@ -23,6 +23,9 @@ export const handleUpload = async (req, res) => {
     res.json({
       message: "Analysis completed",
       chartUrl: result.chartUrl, // image (chart.png)
+      predictions: result.predictions || [],
+      predictionDates: result.predictionDates || [],
+      hasPredictions: result.hasPredictions || false,
       dates: result.dates,       // raw data for Chart.js
       avg: result.avg,
       dma50: result.dma50,

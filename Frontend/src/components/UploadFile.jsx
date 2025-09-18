@@ -6,6 +6,7 @@ const UploadFile = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [chartUrl, setChartUrl] = useState("");
+  const [predictionData, setPredictionData] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -19,6 +20,7 @@ const UploadFile = () => {
     setLoading(true);
     setMessage("Analyzing your file...");
     setChartUrl("");
+    setPredictionData(null); // Clear previous predictions
 
     const formData = new FormData();
     formData.append("file", file);
@@ -28,11 +30,27 @@ const UploadFile = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setMessage(" File processed successfully!");
       const data = response.data;
 
       if (data.chartUrl) {
         setChartUrl(data.chartUrl + `?t=${Date.now()}`);
+
+        // Store prediction data
+        if (data.hasPredictions) {
+          setPredictionData({
+            predictions: data.predictions,
+            dates: data.predictionDates,
+            count: data.predictions.length,
+          });
+          setMessage(
+            `Analysis completed with ${data.predictions.length}-day price predictions!`
+          );
+        } else {
+          setPredictionData(null);
+          setMessage(
+            " Analysis completed! (Need 30+ days of data for predictions)"
+          );
+        }
       } else {
         setMessage("Analysis completed but no chart data received.");
       }
@@ -57,7 +75,12 @@ const UploadFile = () => {
         <input
           type="file"
           accept=".csv,.xlsx,.xls"
-          onChange={(e) => setFile(e.target.files[0])}
+          onChange={(e) => {
+            setFile(e.target.files[0]);
+            setPredictionData(null); // Clear predictions when new file selected
+            setChartUrl(""); // Clear previous chart
+            setMessage(""); // Clear previous message
+          }}
           className="hidden"
         />
         Choose File
@@ -114,6 +137,34 @@ const UploadFile = () => {
         </div>
       )}
 
+      {/* Prediction Details */}
+      {predictionData && (
+        <div className="mt-6 bg-purple-50 border border-purple-200 rounded-lg p-4 max-w-4xl">
+          <h3 className="font-semibold text-purple-800 mb-3 text-lg">
+            🔮 Price Predictions (Next {predictionData.count} Days)
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {predictionData.predictions.map((price, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg p-3 border border-purple-100"
+              >
+                <div className="text-sm text-purple-600 font-medium">
+                  {new Date(predictionData.dates[index]).toLocaleDateString()}
+                </div>
+                <div className="text-lg font-bold text-purple-800">
+                  ${price.toFixed(2)}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 text-xs text-purple-600">
+            * Predictions based on Linear Regression model using historical
+            price patterns and moving averages
+          </div>
+        </div>
+      )}
+
       {/* Instructions */}
       {!file && (
         <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-2xl">
@@ -122,9 +173,10 @@ const UploadFile = () => {
           </h3>
           <ul className="text-sm text-yellow-700 text-left space-y-1">
             <li>• CSV or Excel format (.csv, .xlsx, .xls)</li>
-            <li>• Must contain 'Date' and 'Avg' columns</li>
+            <li>• Must contain 'Date' and 'Avg'/'Close' columns</li>
             <li>• Date should be in standard format (YYYY-MM-DD)</li>
-            <li>• Avg should contain numeric price values</li>
+            <li>• Price values should be numeric</li>
+            <li>• 30+ days of data recommended for predictions</li>
           </ul>
         </div>
       )}
